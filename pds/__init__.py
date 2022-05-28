@@ -1,4 +1,7 @@
-import socket,pickle,glob,os
+import socket
+import pickle
+import glob
+import os
 
 print('PDS is open source based on pcsd software publiched license GNU GPL3')
 
@@ -16,11 +19,11 @@ db = {}
 
 for file in glob.glob("dump.pkl"):
     with open(file, 'rb') as f:
-       db = pickle.load(f)
+        db = pickle.load(f)
 
 while True:
     conn, addr = sock.accept()
-    print('Connnected',addr)
+    print('Connnected', addr)
     req = conn.recv(2048)
     req = req.decode()
     print(req)
@@ -30,22 +33,22 @@ while True:
         key = key.decode()
         value = value.decode()
         try:
-           db[key] = value
-           with open('dump.pkl', 'wb') as f:
-              pickle.dump(db,f)
+            db[key] = value
+            with open('dump.pkl', 'wb') as f:
+                pickle.dump(db, f)
         except KeyError:
-           print('Key Error')
-           conn.close()
+            print('Key Error')
+            conn.close()
 
     if req == 'get':
         key = conn.recv(2048)
         key = key.decode()
         try:
-           result = db[key]
+            result = db[key]
         except KeyError:
-           print('Key Error')
-           conn.send('Key Error'.encode())
-           continue
+            print('Key Error')
+            conn.send('Key Error'.encode())
+            continue
         conn.send(result.encode())
     if req == 'exit':
         sock.close()
@@ -54,33 +57,33 @@ while True:
         db.clear()
         os.system('rm dump.pkl')
     if req == 'ping':
-           conn.send('PONG!'.encode())
+        conn.send('PONG!'.encode())
     if req == 'rm':
-           key = conn.recv(2048)
-           key = key.decode()
-           del db[key]
-           with open('dump.pkl', 'wb') as f:
-              pickle.dump(db,f)
+        key = conn.recv(2048)
+        key = key.decode()
+        del db[key]
+        with open('dump.pkl', 'wb') as f:
+            pickle.dump(db, f)
     if req == 'plus':
-           key = conn.recv(2048)
-           key = key.decode()
-           value_plus = conn.recv(2048)
-           value_plus = value_plus.decode()
-           try:
-              value = db[key]
-              result = value + value_plus
-              db[key] = result
-              with open('dump.pkl', 'wb') as f:
-                 pickle.dump(db,f)
-           except KeyError:
-              print('Key Error')
-              conn.send('Key Error'.encode())              
-    if req == 'rename':
-           key = conn.recv(2048)
-           keynew = conn.recv(2048)
-           key = key.decode()
-           keynew = keynew.decode()
-           value = db.pop(key)
-           db[keynew] = value
-           with open('dump.pkl', 'wb') as f:
+        key = conn.recv(2048)
+        key = key.decode()
+        value_plus = conn.recv(2048)
+        value_plus = value_plus.decode()
+        try:
+            value = db[key]
+            result = value + value_plus
+            db[key] = result
+            with open('dump.pkl', 'wb') as f:
                 pickle.dump(db, f)
+        except KeyError:
+            print('Key Error')
+            conn.send('Key Error'.encode())
+    if req == 'rename':
+        key = conn.recv(2048)
+        keynew = conn.recv(2048)
+        key = key.decode()
+        keynew = keynew.decode()
+        value = db.pop(key)
+        db[keynew] = value
+        with open('dump.pkl', 'wb') as f:
+            pickle.dump(db, f)

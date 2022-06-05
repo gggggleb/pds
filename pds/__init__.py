@@ -2,11 +2,18 @@ import socket
 import pickle
 import glob
 import os
+import sys
 
 print('PDS is open source based on pcsd software publiched license GNU GPL3')
 
-ip = '127.0.0.1'
-port = 4011
+try:
+    ip = sys.argv[1]
+    port = int(sys.argv[2])
+except IndexError:
+    print('Argv not found use default')
+    ip = '127.0.0.1'
+    port = 4011
+
 max_connect = 10
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

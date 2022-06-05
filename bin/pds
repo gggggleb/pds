@@ -1,1 +1,1 @@
-python -m pds
+python -m pds $@

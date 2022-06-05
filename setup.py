@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name='pds',
-    version='1.3',
+    version='1.4',
     description='Pds server',
     url='https://git.glebmail.xyz/PythonPrograms/pcsd',
     author='gleb',

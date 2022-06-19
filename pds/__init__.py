@@ -69,6 +69,7 @@ def test():
         print('Unit ERROR!')
         sys.exit(1)
 
+
 try:
     tests = sys.argv[1]
     if tests == 'test':
@@ -79,12 +80,22 @@ except IndexError:
 print('PDS is open source based on pcsd software publiched license GNU GPL3')
 
 try:
+    from config import *
+
+    ip = ip
+    port = port
+    config = 1
+except ModuleNotFoundError:
+    config = 0
+
+try:
     ip = sys.argv[1]
     port = int(sys.argv[2])
 except IndexError:
-    print('Argv not found use default')
-    ip = '127.0.0.1'
-    port = 4011
+    if config == 0:
+        print('Argv not found use default')
+        ip = '127.0.0.1'
+        port = 4011
 
 max_connect = 10
 

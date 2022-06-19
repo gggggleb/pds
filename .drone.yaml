@@ -10,7 +10,7 @@ steps:
       - mkdir package
       - mv *.whl package
   - name: test
-    image: python
+    image: python:alpine
     commands:
       - pip install package/*.whl
       - pds test

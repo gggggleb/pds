@@ -1,6 +1,5 @@
 kind: pipeline
 name: build
-
 steps:
   - name: build
     image: python:alpine
@@ -9,6 +8,11 @@ steps:
       - rm -r pds.egg-info/ build/
       - mkdir package
       - mv *.whl package
+  - name: test
+    image: python
+    commands:
+      - pip install package/*.whl
+      - pcsd test
   - name: publish
     image: pwddocker/drone-publish:latest
     environment:
@@ -18,10 +22,9 @@ steps:
         from_secret: user
     commands:
       - python3 -m twine upload --repository-url https://git.glebmail.xyz/api/packages/PythonPrograms/pypi -u $USER -p $PASS package/*.whl
-
-trigger:
-  branch:
-  - master
-  event:
-  - push
-  - tag
+    when:
+      event:
+        - push
+        - tag
+      branch:
+        - master

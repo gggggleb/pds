@@ -4,7 +4,6 @@ build:
 		mkdir package
 		mv *.whl package
 test:
-		python pds_test.py
+		python pds/__init__.py test
 install:
 		pip install .
-		rm -r pds.egg-info/ build/

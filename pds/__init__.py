@@ -84,6 +84,7 @@ try:
 
     ip = ip
     port = port
+    max_connect = max_connect
     config = 1
 except ModuleNotFoundError:
     config = 0
@@ -91,11 +92,13 @@ except ModuleNotFoundError:
 try:
     ip = sys.argv[1]
     port = int(sys.argv[2])
+    max_connect = int(sys.argv[3])
 except IndexError:
     if config == 0:
         print('Argv not found use default')
         ip = '127.0.0.1'
         port = 4011
+        max_connect = 10
 
 max_connect = 10
 

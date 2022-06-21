@@ -61,8 +61,30 @@ def test():
             print('rm test ok!')
         else:
             print('rm test no!')
+    main.clear()
+    key = randomword(255)
+    main.set(key, randomword(255))
+    result = main.find_key(key)
 
-    if status == 4:
+    if result == 'Found':
+        status += 1
+        print('find_key ok!')
+    else:
+        print('Find_key test Error!')
+        sys.exit(1)
+
+    main.clear()
+    value = randomword(255)
+    main.set(randomword(255), value)
+    result = main.find_value(value)
+    if result == 'Found':
+        status += 1
+        print('find_value ok!')
+    else:
+        print('find_value no!')
+        sys.exit(1)
+
+    if status == 6:
         print('All metods OK!')
         sys.exit(0)
     else:
@@ -159,3 +181,13 @@ while True:
         key = key.decode()
         keynew = keynew.decode()
         db.rename(key, keynew)
+    if req == 'find_key':
+        key = conn.recv(2048)
+        key = key.decode()
+        result = db.find_key(key)
+        conn.send(result.encode())
+    if req == 'find_value':
+        value = conn.recv(2048)
+        value = value.decode()
+        result = db.find_value(value)
+        conn.send(result.encode())

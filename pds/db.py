@@ -14,6 +14,8 @@ class Pds_db:
             self.db[key] = value
         except KeyError:
             return 'Key Error'
+        with open('dump.pkl', 'wb') as f:
+            pickle.dump(self.db, f)
 
     def get(self, key):
         try:
@@ -27,6 +29,8 @@ class Pds_db:
 
     def rm(self, key):
         del self.db[key]
+        with open('dump.pkl', 'wb') as f:
+            pickle.dump(self.db, f)
 
     def plus(self, key, value_plus):
         try:
@@ -35,7 +39,25 @@ class Pds_db:
             self.db[key] = result
         except KeyError:
             return 'Key Error'
+        with open('dump.pkl', 'wb') as f:
+            pickle.dump(self.db, f)
 
     def rename(self, key, keynew):
         value = self.db.pop(key)
         self.db[keynew] = value
+        with open('dump.pkl', 'wb') as f:
+            pickle.dump(self.db, f)
+
+    def find_key(self, key):
+        keys = self.db.keys()
+        for db_key in keys:
+            if db_key == key:
+                return 'Found'
+        return 'Not_found'
+
+    def find_value(self, value):
+        values = self.db.values()
+        for db_value in values:
+            if db_value == value:
+                return 'Found'
+        return 'Not_found'

@@ -1,7 +1,10 @@
-import socket
+import glob
+import sys
 import random
 import string
-import sys
+import socket
+from _thread import *
+import threading
 from pds.db import Pds_db
 
 
@@ -99,6 +102,8 @@ try:
 except IndexError:
     pass
 
+conn_block = threading.Lock()
+
 print('PDS is open source based on pcsd software publiched license GNU GPL3')
 
 try:
@@ -132,13 +137,8 @@ print('Binded', ip, port)
 
 db = Pds_db()
 
-while True:
-    conn, addr = sock.accept()
-    print('Connnected', addr)
-    req = conn.recv(2048)
-    req = req.decode()
-    print(req)
 
+def Net(db, sock, conn, req):
     if req == 'set':
         key = conn.recv(2048)
         value = conn.recv(2048)
@@ -191,3 +191,17 @@ while True:
         value = value.decode()
         result = db.find_value(value)
         conn.send(result.encode())
+    try:
+        conn_block.release()
+    except RuntimeError:
+        pass
+
+
+while True:
+    conn, addr = sock.accept()
+    print('Connected!', addr)
+    conn_block.acquire()
+    req = conn.recv(2048)
+    req = req.decode()
+    print(req)
+    start_new_thread(Net, (db, sock, conn, req))

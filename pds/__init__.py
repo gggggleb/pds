@@ -1,110 +1,17 @@
-import glob
+
 import sys
-import random
-import string
-import socket
-from _thread import *
-import threading
+
 from pds.db import Pds_db
-
-
-def test():
-    status = 0
-
-    main = Pds_db()
-
-    def randomword(length):
-        letters = string.ascii_lowercase
-        return ''.join(random.choice(letters) for i in range(length))
-
-    one = randomword(555)
-    two = randomword(555)
-    main.set(one, two)
-
-    if main.get(one) == two:
-        print('test set_get ok!')
-        status += 1
-    else:
-        print('test set_get no!')
-        sys.exit(1)
-
-    one_ren = randomword(555)
-    main.rename(one, one_ren)
-
-    if main.get(one_ren) == two:
-        print('test rename ok!')
-        status += 1
-        main.clear()
-    else:
-        print('test rename no!')
-        sys.exit(1)
-
-    one = randomword(555)
-    two = randomword(555)
-    two1 = randomword(555)
-    two_plus = two + two1
-    main.set(one, two)
-    main.plus(one, two1)
-
-    if main.get(one) == two_plus:
-        status += 1
-        print('plus test ok!')
-        main.clear()
-    else:
-        sys.exit(1)
-
-    one = randomword(555)
-    two = randomword(555)
-    main.set(one, two)
-
-    if main.get(one) == two:
-        main.rm(one)
-        if main.get(one) == 'Key Error':
-            status += 1
-            print('rm test ok!')
-        else:
-            print('rm test no!')
-    main.clear()
-    key = randomword(255)
-    main.set(key, randomword(255))
-    result = main.find_key(key)
-
-    if result == 'Found':
-        status += 1
-        print('find_key ok!')
-    else:
-        print('Find_key test Error!')
-        sys.exit(1)
-
-    main.clear()
-    value = randomword(255)
-    main.set(randomword(255), value)
-    result = main.find_value(value)
-    if result == 'Found':
-        status += 1
-        print('find_value ok!')
-    else:
-        print('find_value no!')
-        sys.exit(1)
-
-    if status == 6:
-        print('All metods OK!')
-        sys.exit(0)
-    else:
-        print('Unit ERROR!')
-        sys.exit(1)
-
+from pds.net import main
+from pds.test import test
 
 try:
     tests = sys.argv[1]
     if tests == 'test':
-        test()
+        test_db = Pds_db()
+        test(test_db)
 except IndexError:
     pass
-
-conn_block = threading.Lock()
-
-print('PDS is open source based on pcsd software publiched license GNU GPL3')
 
 try:
     from config import *
@@ -127,85 +34,10 @@ except IndexError:
         port = 4011
         max_connect = 10
 
-max_connect = 10
+db = Pds_db()
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind((ip, port))
-sock.listen(max_connect)
+print('PDS is open source software publiched license GNU GPL3')
 
 print('Binded', ip, port)
 
-db = Pds_db()
-
-
-def Net(db, sock, conn, status):
-    if status == 'init':
-        conn.send('sendreq'.encode())
-    req = conn.recv(2048)
-    req = req.decode()
-    print(req)
-    if req == 'set':
-        key = conn.recv(2048)
-        value = conn.recv(2048)
-        key = key.decode()
-        value = value.decode()
-        result = db.set(key, value)
-        if result == 'Key Error':
-            print('Key Error')
-
-    if req == 'get':
-        key = conn.recv(2048)
-        key = key.decode()
-        result = db.get(key)
-        if result == 'Key Error':
-            print('Key Error')
-        conn.send(result.encode())
-
-    if req == 'exit':
-        sock.close()
-        exit()
-    if req == 'clear':
-        db.clear()
-    if req == 'ping':
-        conn.send('PONG!'.encode())
-    if req == 'rm':
-        key = conn.recv(2048)
-        key = key.decode()
-        db.rm(key)
-    if req == 'plus':
-        key = conn.recv(2048)
-        key = key.decode()
-        value_plus = conn.recv(2048)
-        value_plus = value_plus.decode()
-        result = db.plus(key, value_plus)
-        if result == 'Key Error':
-            print('Key Error')
-    if req == 'rename':
-        key = conn.recv(2048)
-        keynew = conn.recv(2048)
-        key = key.decode()
-        keynew = keynew.decode()
-        db.rename(key, keynew)
-    if req == 'find_key':
-        key = conn.recv(2048)
-        key = key.decode()
-        result = db.find_key(key)
-        conn.send(result.encode())
-    if req == 'find_value':
-        value = conn.recv(2048)
-        value = value.decode()
-        result = db.find_value(value)
-        conn.send(result.encode())
-    try:
-        conn_block.release()
-    except RuntimeError:
-        pass
-
-
-while True:
-    conn, addr = sock.accept()
-    print('Connected!', addr)
-    conn_block.acquire()
-    status = conn.recv(2048)
-    status = status.decode()
-    start_new_thread(Net, (db, sock, conn, status))
+main(ip, port, max_connect, db)

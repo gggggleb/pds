@@ -1,4 +1,4 @@
-def Net(db, sock, conn, status):
+def Net(db, sock, conn, status, conn_block):
     if status == 'init':
         conn.send('sendreq'.encode())
     req = conn.recv(2048)

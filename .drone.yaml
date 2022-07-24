@@ -9,6 +9,7 @@ steps:
       - rm -r pds.egg-info/ build/
       - mkdir package
       - mv *.whl package
+      - rm package/PyYAML-*
   - name: test
     image: python:alpine
     commands:

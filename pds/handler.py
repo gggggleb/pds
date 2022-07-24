@@ -1,3 +1,6 @@
+import yaml
+import importlib
+
 def Net(db, sock, conn, status, conn_block):
     if status == 'init':
         conn.send('sendreq'.encode())
@@ -56,6 +59,15 @@ def Net(db, sock, conn, status, conn_block):
         value = value.decode()
         result = db.find_value(value)
         conn.send(result.encode())
+    try:
+        with open('plugins.yml', 'r') as stream:
+            out = yaml.safe_load(stream)
+            plugins = out['plugins']
+            for plugin in plugins:
+                module = importlib.import_module(plugin)
+                module.handler(db, conn, req)
+    except FileNotFoundError:
+        pass
     try:
         conn_block.release()
     except RuntimeError:

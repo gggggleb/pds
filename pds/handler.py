@@ -59,6 +59,8 @@ def Net(db, sock, conn, status, conn_block):
         value = value.decode()
         result = db.find_value(value)
         conn.send(result.encode())
+    if req == 'list':
+        conn.send(str(db.list()).encode())
     try:
         with open('plugins.yml', 'r') as stream:
             out = yaml.safe_load(stream)

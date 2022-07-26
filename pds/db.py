@@ -61,3 +61,5 @@ class Pds_db:
             if db_value == value:
                 return 'Found'
         return 'Not_found'
+    def list(self):
+        return self.db

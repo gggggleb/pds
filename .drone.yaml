@@ -24,7 +24,20 @@ steps:
         from_secret: user
     commands:
       - python3 -m twine upload --repository-url https://git.glebmail.xyz/api/packages/PythonPrograms/pypi -u $USER -p $PASS package/*.whl
-
+    when:
+      event:
+        - push
+      branch:
+        - master
+  - name: publish-docker
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: user-docker
+      password:
+        from_secret: pass-docker
+      repo: pwddocker/pds
+      tags: latest
     when:
       event:
         - push
